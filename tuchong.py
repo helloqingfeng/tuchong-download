@@ -10,7 +10,7 @@ class Tuchong(object):
 	def __init__(self, url = None, uid = None):
 		self.url = url
 		self.uid = uid
-		self.num = 1
+		self.num = 20
 
 	def download_blog(self, url = None, path = r'./img/'):
 		if path == r'./img/':
@@ -60,7 +60,6 @@ class Tuchong(object):
 
 		file_path = path + title + r'/'
 		print 'All: %d' % len(imglist)
-		# print file_path.encode('utf8')
 		print file_path.encode('gbk')
 		with open(file_path + 'info.txt', 'w') as f:
 			f.write(author.encode('utf8')), f.write('\t')
@@ -83,7 +82,6 @@ class Tuchong(object):
 				with open(img_path, 'rb') as f:
 					print img_path + ' is OK!'
 			except:
-				# print img_path.encode('utf8'),
 				print img_path.encode('gbk'),
 				with open(img_path, 'wb') as f:
 					f.write(response.content)
@@ -96,9 +94,16 @@ class Tuchong(object):
 		else:
 			url = r'https://tuchong.com/%d/' % self.uid
 		print url
+
 		r = requests.get(url)
 		text = r.text
 		soup = BeautifulSoup(text, 'lxml')
+
+		if type(self.uid) is str:
+			f_img = soup.find('img', attrs={'class':'profile-icon'})
+			temp_id = f_img.attrs['src'].split('/')[5]
+			self.uid = int(temp_id)
+
 		meta = soup.select(r'meta[name="author"]')[0]
 		author = meta.attrs['content']
 		l = list(r'\/:*?"<>|')
@@ -143,10 +148,14 @@ class Tuchong(object):
 
 
 if __name__ == '__main__':
-	uid = 24935
-	t = Tuchong(uid = uid)
-	t.download_person()
+	# uid = 24935
+	# t = Tuchong(uid = uid)
+	# t.download_person()
 	
 	# url = r'https://quyu.tuchong.com/12728263/'
 	# t = Tuchong(url = url)
 	# t.download_blog()
+	
+	uid = r'https://tuchong.com/490455/'
+	t = Tuchong(uid = uid)
+	t.download_person()
